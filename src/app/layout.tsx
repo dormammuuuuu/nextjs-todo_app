@@ -12,13 +12,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en"> 
       <body>
-      <div className="grid grid-cols-6 grid-rows-2 h-screen">
-            <div className=" bg-black/90 row-start-1 row-end-3 col-start-1 col-end-2">
+      <div className="h-screen relative">
+            <div id="sidebar" className=" bg-zinc-800 fixed top-0 left-0 bottom-0 w-64">
                <Sidebar />
             </div>
-            <div className="bg-black/95 row-start-1 row-end-3 col-start-2 col-end-7">
+            <div id="main" className="h-full ml-64 relative">
                 {children}
             </div>
          </div>

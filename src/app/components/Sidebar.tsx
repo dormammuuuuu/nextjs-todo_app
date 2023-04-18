@@ -1,97 +1,139 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
-import { db } from '../config';
+import { db } from '../config'
 import Link from 'next/link'
+import  { BiX, BiMenu, BiPlus } from "react-icons/bi"
 
 const Sidebar = (): JSX.Element => {
-  const [lists, setLists] = useState<{ id: string; name: string }[]>([]);
-  const [showNew, setShowNew] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [input, setInput] = useState<string>('');
+  const [lists, setLists] = useState<{ id: string; name: string; color: string }[]>([])
+  const [showNew, setShowNew] = useState<boolean>(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [input, setInput] = useState<string>('Untitled')
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    const listsRef = db.ref('lists');
+    document.addEventListener('mousedown', handleClickOutside)
+    const listsRef = db.ref('lists')
     listsRef.on('value', (snapshot) => {
-      let lists = snapshot.val();
-      const listsArray = [];
+      let lists = snapshot.val()
+      const listsArray = []
       for (let id in lists) {
-        listsArray.push({ id, ...lists[id] });
+        listsArray.push({ id, ...lists[id] })
       }
-      setLists(listsArray);
-    });
+      setLists(listsArray)
+    })
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      listsRef.off();
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+      listsRef.off()
+    }
+  }, [])
   
   const handleAddList = () => {
-    setShowNew(true);
-  };
+    setShowNew(true)
+  }
 
   const firebaseAdd = (name: string) => {
     // sanitize input turn it to slug
-    const slug_id = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const slug_id = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+    let color = randomTailwindColor()
     try {
-      db.ref("lists/" + slug_id).set({name: input});
+      db.ref("lists/" + slug_id).set({
+        name: input,
+        color: color,
+    })
     } catch (error) {
-      console.error('Error adding:', error);
+      console.error('Error adding:', error)
     }
-    setLists([...lists, { id: slug_id, name: input }]);
-  };
+    setLists([...lists, { id: slug_id, name: input, color: color }])
+  }
 
   const handleClickOutside = (event: MouseEvent) => {
     if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
       if (input !== '') {
-        firebaseAdd(input);
+        firebaseAdd(input)
       }
-      setShowNew(false);
-      setInput('');
+      setShowNew(false)
+      setInput('')
     }
-  };
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (input !== '') {
-        firebaseAdd(input);
+        firebaseAdd(input)
       }
-      setShowNew(false);
-      setInput('');
+      setShowNew(false)
+      setInput('Untitled')
     }
-  };
+  }
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.currentTarget.value);
-  };
+    setInput(e.currentTarget.value)
+  }
 
   const firstLetter = (str: string) => {
-    return str.charAt(0).toUpperCase();
-  };
+    return str.charAt(0).toUpperCase()
+  }
+
+  const sidebarToggle = () => {
+    const sidebar_close = document.getElementById('sidebar-close')
+    const sidebar = document.getElementById('sidebar')
+    const main = document.getElementById('main')
+    const title = document.getElementById('title')
+    const sidebar_taskNames = document.querySelectorAll('.sidebar-taskName')
+    if (sidebar?.classList.contains('w-64')) {
+      sidebar?.classList.remove('w-64')
+      main?.classList.remove('ml-64')
+      main?.classList.add('ml-24')
+      title?.classList.add('hidden')
+      sidebar_taskNames?.forEach((taskName) => {
+        taskName.classList.add('hidden')
+      })
+      setSidebarOpen(false)
+    } else {
+      sidebar?.classList.add('w-64')
+      main?.classList.remove('ml-24')
+      main?.classList.add('ml-64')
+      title?.classList.remove('hidden')
+      sidebar_taskNames?.forEach((taskName) => {
+        taskName.classList.remove('hidden')
+      })
+      setSidebarOpen(true)
+    }
+  }
+
+  const randomTailwindColor = () => {
+    const colors = ['bg-red-500', 'bg-yellow-500', 'bg-green-500', 'bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-teal-500', 'bg-cyan-500', 'bg-lime-500', 'bg-fuchsia-500', 'bg-rose-500']
+    return colors[Math.floor(Math.random() * colors.length)]
+  }
 
   return (
     <div className="relative h-full p-3">
-      <div className='m-3'>
-				<h1 className="text-2xl font-bold">To-Do List</h1>
+      <div className='m-3 flex justify-between items-center'>
+				<h1 id="title" className="text-2xl font-bold">To-Do List</h1>
+        <button id="sidebar-close" onClick={sidebarToggle}>
+          {sidebarOpen ? <BiX className='text-3xl'/> : <BiMenu className='text-3xl'/> }
+        </button>
       </div>
       <div className='my-7'>
         <ul className="space-y-1">
           {lists.map((list) => (
-            <li className="flex items-center gap-3 my-2 hover:bg-white/10 p-2 rounded-sm" key={list.id}><div className='bg-blue-500 rounded-sm w-6 flex justify-center items-center text-xs py-1'>{ firstLetter(list.id) }</div><Link href={`/${list.id}`}>{list.name}</Link></li>
+            <Link href={`/${list.id}`} className="flex items-center gap-5 my-2 hover:bg-white/10 p-2 rounded-md" key={list.id}><div className={`${list.color} rounded-md w-10 flex justify-center items-center text-base py-2`}>{ firstLetter(list.id) }</div><span className='sidebar-taskName truncate'>{list.name}</span></Link>
           ))}
           {showNew && (
-            <input type="text" className="w-full bg-transparent border-b-2" onInput={handleInput} onKeyDown={handleKeyPress} ref={inputRef} />
+            <input type="text" value="Untitled" className="w-full bg-transparent border-b-2" onInput={handleInput} onKeyDown={handleKeyPress} ref={inputRef} />
           )}
         </ul>
         
       </div>
       {!showNew && (
-        <button className="absolute bottom-0 left-0 right-0 p-3 bg-blue-500" onClick={handleAddList}>
-          New List
+        <button className="absolute bottom-0 left-0 right-0 py-3 flex items-center gap-5 justify-center" onClick={handleAddList}>
+          <BiPlus className='text-2xl'/>
+          <span className='sidebar-taskName'>New task</span>
         </button>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

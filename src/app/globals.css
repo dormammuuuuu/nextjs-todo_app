@@ -5,6 +5,8 @@
 @layer base {
     /* Base styles */
     body{
-        @apply text-white/80;
+        @apply text-neutral-200;
+        @apply transition;
+        @apply bg-zinc-900;
     }
 }
