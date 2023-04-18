@@ -8,7 +8,7 @@ const Sidebar = (): JSX.Element => {
   const [lists, setLists] = useState<{ id: string; name: string; color: string }[]>([])
   const [showNew, setShowNew] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [input, setInput] = useState<string>('Untitled')
+  const [input, setInput] = useState<string>('')
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true)
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const Sidebar = (): JSX.Element => {
         firebaseAdd(input)
       }
       setShowNew(false)
-      setInput('Untitled')
+      setInput('')
     }
   }
 
@@ -121,7 +121,7 @@ const Sidebar = (): JSX.Element => {
             <Link href={`/${list.id}`} className="flex items-center gap-5 my-2 hover:bg-white/10 p-2 rounded-md" key={list.id}><div className={`${list.color} rounded-md w-10 flex justify-center items-center text-base py-2`}>{ firstLetter(list.id) }</div><span className='sidebar-taskName truncate'>{list.name}</span></Link>
           ))}
           {showNew && (
-            <input type="text" value="Untitled" className="w-full bg-transparent border-b-2" onInput={handleInput} onKeyDown={handleKeyPress} ref={inputRef} />
+            <input type="text" className="w-full bg-transparent border-b-2" onInput={handleInput} onKeyDown={handleKeyPress} ref={inputRef} />
           )}
         </ul>
         
