@@ -61,7 +61,20 @@ const TaskViewPage = ({ params: { id } }: {
 
   const handleStatus = (e: React.MouseEvent<HTMLInputElement>) => {
     console.log(e.currentTarget.checked);
-    
+    //update firebase status
+    const task_id = e.currentTarget.id.split('-')[2];
+    console.log(`lists/${id}/tasks/-${task_id}`);
+    db.ref(`lists/${id}/tasks/-${task_id}`).update({
+      status: e.currentTarget.checked
+    });
+    //update local status
+    const updatedTasks = lists.map((task) => {
+      if (task.id === task_id) {
+        task.status = e.currentTarget.checked;
+      }
+      return task;
+    });
+    setLists(updatedTasks);
   }
 
   return (
@@ -72,9 +85,9 @@ const TaskViewPage = ({ params: { id } }: {
       <div className=' overflow-y-auto'>
         <ul>
           {lists.map((list) => (
-            <li className='w-full mb-2 rounded-md p-3 text-lg bg-zinc-800' key={list.id}>
-              <input type="checkbox" onClick={handleStatus}/>
-              <p>{list.name}</p>
+            <li className='select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer' key={list.id}>
+              <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus}/>
+              <label htmlFor={`task-${list.id}`}>{list.name}</label>
             </li>
           ))}
         </ul>
