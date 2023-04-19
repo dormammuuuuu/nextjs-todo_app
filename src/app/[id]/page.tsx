@@ -59,6 +59,11 @@ const TaskViewPage = ({ params: { id } }: {
     }
   };
 
+  const handleStatus = (e: React.MouseEvent<HTMLInputElement>) => {
+    console.log(e.currentTarget.checked);
+    
+  }
+
   return (
     <div className='p-10'>
       <div className='pb-10'>
@@ -67,7 +72,10 @@ const TaskViewPage = ({ params: { id } }: {
       <div className=' overflow-y-auto'>
         <ul>
           {lists.map((list) => (
-            <li className='w-full mb-2 rounded-md p-3 text-lg bg-zinc-800' key={list.id}>{list.name}</li>
+            <li className='w-full mb-2 rounded-md p-3 text-lg bg-zinc-800' key={list.id}>
+              <input type="checkbox" onClick={handleStatus}/>
+              <p>{list.name}</p>
+            </li>
           ))}
         </ul>
       </div>
