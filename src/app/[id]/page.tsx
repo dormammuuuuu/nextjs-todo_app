@@ -20,8 +20,10 @@ const TaskViewPage = ({ params: { id } }: {
       const { color, name, tasks }: { color: string; name: string; tasks: { [key: string]: { name: string; status: boolean } } } = listsVal;
       setColor(color);
       setTitle(name);
-      const listsArray = Object.entries(tasks).map(([key, task]) => ({ id: key, ...task }));
-      setLists(listsArray);
+      if (tasks) {
+        const listsArray = Object.entries(tasks).map(([key, task]) => ({ id: key, ...task }));
+        setLists(listsArray);
+      }
     });
   
     // Unsubscribe from Firebase when the component unmounts
@@ -35,12 +37,15 @@ const TaskViewPage = ({ params: { id } }: {
       db.ref(`lists/${id}/tasks/`).push({
         name: input,
         status: false
-      });
+      })
+      .then((res: any)=> {
+        setLists([...lists, { id: res.key, name: input, status: false }]);
+        setInput('')
+      })
     } catch (error) {
       console.error('Error adding:', error);
     }
-    setLists([...lists, { id: (lists.length + 1).toString(), name: input, status: false }]);
-    setInput('')
+
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,21 +65,24 @@ const TaskViewPage = ({ params: { id } }: {
   };
 
   const handleStatus = (e: React.MouseEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget.checked);
     //update firebase status
+    let taskArrayTemp: { id: string; name: string; status: boolean }[] = [];
     const task_id = e.currentTarget.id.split('-')[2];
-    console.log(`lists/${id}/tasks/-${task_id}`);
     db.ref(`lists/${id}/tasks/-${task_id}`).update({
       status: e.currentTarget.checked
+    }).then(() => {
+      // update the list of tasks
+      taskArrayTemp = lists.map((task) => {
+        if (task.id === `-${task_id}`) {
+          console.log(task.id + " + -" + task_id);  
+          task.status = !task.status;
+        }
+        return task;
+      });        
+      console.log(taskArrayTemp);
+    }).catch((error) => {
+      console.error('Error updating:', error);
     });
-    //update local status
-    const updatedTasks = lists.map((task) => {
-      if (task.id === task_id) {
-        task.status = e.currentTarget.checked;
-      }
-      return task;
-    });
-    setLists(updatedTasks);
   }
 
   return (
@@ -84,13 +92,25 @@ const TaskViewPage = ({ params: { id } }: {
       </div>
       <div className=' overflow-y-auto'>
         <ul>
-          {lists.map((list) => (
-            <li className={`${list.status == true ? 'line-through' : ''} select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer`} key={list.id}>
-              <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus} checked={list.status}/>
+          {lists.filter((list) => !list.status).map((list) => (
+            <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer`} key={list.id}>
+              <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus}/>
               <label htmlFor={`task-${list.id}`}>{list.name}</label>
             </li>
           ))}
         </ul>
+        
+        {lists.some((list) => list.status) && (
+          <ul>
+            <p className="text-xl py-5">Completed</p>
+            {lists.filter((list) => list.status).map((list) => (
+              <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer`} key={list.id}>
+                <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus} defaultChecked/>
+                <label htmlFor={`task-${list.id}`} className=' text-zinc-500 line-through'>{list.name}</label>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className='sticky bottom-10 left-10 right-10 bg-zinc-800 p-3 rounded-md shadow-sm z-10'>
         <div className="flex">

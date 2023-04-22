@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 
 // export const metadata = {
@@ -7,9 +6,13 @@ import React from 'react'
 // }
 
 const HomePage = () => {
+  // render the page [id].tsx
   return (
-    <div>HomePage</div>
+    <div>
+      <h1>Home Page</h1>
+    </div>
   )
+  
 }
 
 export default HomePage
