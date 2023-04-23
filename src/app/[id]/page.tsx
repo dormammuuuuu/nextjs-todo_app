@@ -19,6 +19,7 @@ const TaskViewPage = ({ params: { id } }: {
       const listsVal = snapshot.val();
       const { color, name, tasks }: { color: string; name: string; tasks: { [key: string]: { name: string; status: boolean } } } = listsVal;
       setColor(color);
+      console.log(color);
       setTitle(name);
       if (tasks) {
         const listsArray = Object.entries(tasks).map(([key, task]) => ({ id: key, ...task }));
@@ -88,13 +89,13 @@ const TaskViewPage = ({ params: { id } }: {
   return (
     <div className='p-10'>
       <div className='pb-10'>
-        <h1 className='text-4xl font-bold tracking-wider'>{title}</h1>
+        <h1 className={`text-${color}-400 text-4xl font-bold tracking-wider`}>{title}</h1>
       </div>
       <div className=' overflow-y-auto'>
         <ul>
           {lists.filter((list) => !list.status).map((list) => (
-            <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer`} key={list.id}>
-              <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus}/>
+            <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} key={list.id}>
+              <input id={`task-${list.id}`} type="checkbox" className={`accent-${color}-500 w-5 h-5 bg-transparent`} onClick={handleStatus}/>
               <label htmlFor={`task-${list.id}`}>{list.name}</label>
             </li>
           ))}
@@ -104,8 +105,8 @@ const TaskViewPage = ({ params: { id } }: {
           <ul>
             <p className="text-xl py-5">Completed</p>
             {lists.filter((list) => list.status).map((list) => (
-              <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex gap-3 cursor-pointer`} key={list.id}>
-                <input id={`task-${list.id}`} type="checkbox" onClick={handleStatus} defaultChecked/>
+              <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} key={list.id}>
+                <input id={`task-${list.id}`} type="checkbox" className={`accent-${color}-500 w-5 h-5 bg-transparent`} onClick={handleStatus} defaultChecked/>
                 <label htmlFor={`task-${list.id}`} className=' text-zinc-500 line-through'>{list.name}</label>
               </li>
             ))}

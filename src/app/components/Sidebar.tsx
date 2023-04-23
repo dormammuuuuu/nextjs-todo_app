@@ -103,7 +103,7 @@ const Sidebar = (): JSX.Element => {
   }
 
   const randomTailwindColor = () => {
-    const colors = ['bg-red-500', 'bg-yellow-500', 'bg-green-500', 'bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-teal-500', 'bg-cyan-500', 'bg-lime-500', 'bg-fuchsia-500', 'bg-rose-500']
+    const colors = ['red', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink', 'teal', 'cyan', 'lime', 'fuchsia', 'rose']
     return colors[Math.floor(Math.random() * colors.length)]
   }
 
@@ -118,7 +118,12 @@ const Sidebar = (): JSX.Element => {
       <div className='my-7'>
         <ul className="space-y-1">
           {lists.map((list) => (
-            <Link href={`/${list.id}`} className="flex items-center gap-5 my-2 hover:bg-white/10 p-2 rounded-md" key={list.id}><div className={`${list.color} rounded-md w-10 flex justify-center items-center text-base py-2`}>{ firstLetter(list.id) }</div><span className='sidebar-taskName truncate'>{list.name}</span></Link>
+            <Link href={`/${list.id}`} className="flex items-center gap-5 my-2 hover:bg-white/10 p-2 rounded-md" key={list.id}>
+              <div className={`bg-${list.color}-500 rounded-md w-10 flex justify-center items-center text-base py-2`}>
+                {firstLetter(list.id)}
+              </div>
+              <span className='sidebar-taskName truncate'>{list.name}</span>
+            </Link>          
           ))}
           {showNew && (
             <input type="text" className="w-full bg-transparent border-b-2" onInput={handleInput} onKeyDown={handleKeyPress} ref={inputRef} />

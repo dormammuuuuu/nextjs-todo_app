@@ -1,15 +1,12 @@
 import React from 'react'
-
-// export const metadata = {
-//   title: 'Add To-Do Item',
-//   description: 'Add a new to-do item.',
-// }
+import LottieRender from './components/LottieRender'
+import * as homePageLottie from './lotties/ManWithTask.json'
 
 const HomePage = () => {
   // render the page [id].tsx
   return (
-    <div>
-      <h1>Home Page</h1>
+    <div className='h-full flex flex-col items-center justify-center'>
+      <LottieRender src={homePageLottie} height="700px" width="700px"/>
     </div>
   )
   
