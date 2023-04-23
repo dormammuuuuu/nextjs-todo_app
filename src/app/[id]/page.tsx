@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../config';
 import { BiPlus } from 'react-icons/bi';
+import SlideOver from '../components/SlideOver';
 
 const TaskViewPage = ({ params: { id } }: {
   params: Array<string>;
@@ -11,6 +12,8 @@ const TaskViewPage = ({ params: { id } }: {
   const inputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState<string>('')
   const [color, setColor] = useState<string>('')
+  const [slideOver, setSlideOver] = useState<boolean>(false)
+  const [selectedListItemId, setSelectedListItemId] = useState<string>('');
 
   useEffect(() => {
     // Fetch Firebase data
@@ -86,17 +89,26 @@ const TaskViewPage = ({ params: { id } }: {
     });
   }
 
+  const handleSlideOver = (e: React.MouseEvent<HTMLLIElement>) => {
+    setSelectedListItemId(e.currentTarget.id);
+    setSlideOver(true);
+  }
+
   return (
-    <div className='p-10'>
+    <div className={`p-10 ${slideOver ? 'mr-96' : ''}`}>
+      { slideOver &&
+        <SlideOver taskID={selectedListItemId} title={title} color={color} />
+      }
       <div className='pb-10'>
         <h1 className={`text-${color}-400 text-4xl font-bold tracking-wider`}>{title}</h1>
       </div>
       <div className=' overflow-y-auto'>
+
         <ul>
           {lists.filter((list) => !list.status).map((list) => (
-            <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} key={list.id}>
+            <li onClick={handleSlideOver} className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} id={`${list.id}`} key={list.id}>
               <input id={`task-${list.id}`} type="checkbox" className={`accent-${color}-500 w-5 h-5 bg-transparent`} onClick={handleStatus}/>
-              <label htmlFor={`task-${list.id}`}>{list.name}</label>
+              <label>{list.name}</label>
             </li>
           ))}
         </ul>
@@ -105,13 +117,14 @@ const TaskViewPage = ({ params: { id } }: {
           <ul>
             <p className="text-xl py-5">Completed ({lists.filter((list) => list.status).length})</p>
             {lists.filter((list) => list.status).map((list) => (
-              <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} key={list.id}>
+              <li onClick={handleSlideOver} className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} id={`${list.id}`} key={list.id}>
                 <input id={`task-${list.id}`} type="checkbox" className={`accent-${color}-500 w-5 h-5 bg-transparent`} onClick={handleStatus} defaultChecked/>
-                <label htmlFor={`task-${list.id}`} className=' text-zinc-500 line-through'>{list.name}</label>
+                <label className=' text-zinc-500 line-through'>{list.name}</label>
               </li>
             ))}
           </ul>
         )}
+        
       </div>
       <div className='sticky bottom-10 left-10 right-10 bg-zinc-800 p-3 rounded-md shadow-sm z-10'>
         <div className="flex">

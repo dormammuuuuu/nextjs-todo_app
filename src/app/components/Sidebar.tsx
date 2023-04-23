@@ -119,7 +119,7 @@ const Sidebar = (): JSX.Element => {
         <ul className="space-y-1">
           {lists.map((list) => (
             <Link href={`/${list.id}`} className="flex items-center gap-5 my-2 hover:bg-white/10 p-2 rounded-md" key={list.id}>
-              <div className={`bg-${list.color}-500 rounded-md w-10 flex justify-center items-center text-base py-2`}>
+              <div className={`bg-${list.color}-500 rounded-md w-10 flex justify-center items-center text-base py-2 font-bold`}>
                 {firstLetter(list.id)}
               </div>
               <span className='sidebar-taskName truncate'>{list.name}</span>
