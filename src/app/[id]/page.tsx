@@ -103,7 +103,7 @@ const TaskViewPage = ({ params: { id } }: {
         
         {lists.some((list) => list.status) && (
           <ul>
-            <p className="text-xl py-5">Completed</p>
+            <p className="text-xl py-5">Completed ({lists.filter((list) => list.status).length})</p>
             {lists.filter((list) => list.status).map((list) => (
               <li className={`select-none w-full mb-2 rounded-md p-3 text-lg bg-zinc-800 flex items-center gap-3 cursor-pointer`} key={list.id}>
                 <input id={`task-${list.id}`} type="checkbox" className={`accent-${color}-500 w-5 h-5 bg-transparent`} onClick={handleStatus} defaultChecked/>
